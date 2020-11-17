@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 颜色面板管理器.
 /// </summary>
-public class ColorPanel : MonoBehaviour, IDragHandler
+public class ColorPanel : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
     public static ColorPanel Instance;
 
@@ -75,23 +75,39 @@ public class ColorPanel : MonoBehaviour, IDragHandler
         gameObject.GetComponent<RawImage>().texture = colorTexture;
     }
 
+    void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+    {
+        colorCircle.position = eventData.position;
+
+        // 颜色采样.
+        int u = (int)(Mathf.Abs(colorCircle.localPosition.x + 200) / 400 * textureWidth);
+        int v = (int)((400 - Mathf.Abs(colorCircle.localPosition.y - 200)) / 400 * textureWidth);
+
+        finalColorImage.color = colorTexture.GetPixel(u, v);
+    }
+
     void IDragHandler.OnDrag(PointerEventData eventData)
     {
         colorCircle.position = eventData.position;
 
         // 边界处理.
-        if (colorCircle.localPosition.x > 400)
-            colorCircle.localPosition = new Vector3(400, colorCircle.localPosition.y, 0);
-        if (colorCircle.localPosition.x < -400)
-            colorCircle.localPosition = new Vector3(-400, colorCircle.localPosition.y, 0);
-        if (colorCircle.localPosition.y > 400)
-            colorCircle.localPosition = new Vector3(colorCircle.localPosition.x, 400, 0);
-        if (colorCircle.localPosition.y < -400)
-            colorCircle.localPosition = new Vector3(colorCircle.localPosition.x, -400, 0);
+        if (colorCircle.localPosition.x > 200)
+            colorCircle.localPosition = new Vector3(200, colorCircle.localPosition.y, 0);
+        if (colorCircle.localPosition.x < -200)
+            colorCircle.localPosition = new Vector3(-200, colorCircle.localPosition.y, 0);
+        if (colorCircle.localPosition.y > 200)
+            colorCircle.localPosition = new Vector3(colorCircle.localPosition.x, 200, 0);
+        if (colorCircle.localPosition.y < -200)
+            colorCircle.localPosition = new Vector3(colorCircle.localPosition.x, -200, 0);
 
         // 颜色采样.
-        int u = (int)(Mathf.Abs(colorCircle.localPosition.x + 400) / 800 * textureWidth);
-        int v = (int)((800 - Mathf.Abs(colorCircle.localPosition.y - 400)) / 800 * textureWidth);
+        ChangeFinalColor();
+    }
+
+    public void ChangeFinalColor()
+    {
+        int u = (int)(Mathf.Abs(colorCircle.localPosition.x + 200) / 400 * textureWidth);
+        int v = (int)((400 - Mathf.Abs(colorCircle.localPosition.y - 200)) / 400 * textureWidth);
 
         finalColorImage.color = colorTexture.GetPixel(u, v);
     }

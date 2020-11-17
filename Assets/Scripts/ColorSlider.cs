@@ -82,8 +82,9 @@ public class ColorSlider : MonoBehaviour
 
     private void SliderValueChanged(float value)
     {
-        int u = (int)((1 - value) * textureWidth);
+        int u = (int)(value * textureWidth);
         Color color = colorTexture.GetPixel(u, 1);
         ColorPanel.Instance.CreateColorTexture(color);
+        ColorPanel.Instance.ChangeFinalColor();
     }
 }
